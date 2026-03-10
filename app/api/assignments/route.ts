@@ -1,109 +1,93 @@
-import { NextResponse } from "next/server";
-import { assignments, AssignmentStatus } from "@/lib/data";
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "../../../lib/prisma";
 
 /**
  * @swagger
  * /api/assignments:
  *   get:
  *     summary: Get all assignments
- *     tags:
- *       - Assignments
  *     responses:
  *       200:
- *         description: Assignments fetched successfully
+ *         description: List of assignments
+ */
+export async function GET() {
+  try {
+    const assignments = await prisma.assignment.findMany({
+      orderBy: {
+        assignmentDate: "desc",
+      },
+    });
+
+    return NextResponse.json(assignments, { status: 200 });
+  } catch (error) {
+    console.error("GET /api/assignments error:", error);
+
+    return NextResponse.json(
+      { message: "Failed to fetch assignments" },
+      { status: 500 },
+    );
+  }
+}
+
+/**
+ * @swagger
+ * /api/assignments:
  *   post:
  *     summary: Create a new assignment
- *     tags:
- *       - Assignments
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - title
- *               - course
- *               - deadline
- *               - status
  *             properties:
  *               title:
  *                 type: string
- *               course:
- *                 type: string
  *               description:
  *                 type: string
- *               deadline:
+ *               dueDate:
  *                 type: string
- *                 example: 2026-03-10
  *               status:
  *                 type: string
- *                 enum: [pending, in_progress, completed]
+ *                 enum: [create, on process, submitted]
  *     responses:
  *       201:
- *         description: Assignment created successfully
- *       400:
- *         description: Validation error
+ *         description: Assignment created
  */
-
-const validStatuses: AssignmentStatus[] = [
-  "pending",
-  "in_progress",
-  "completed",
-];
-
-export async function GET() {
-  return NextResponse.json(
-    {
-      message: "Assignments fetched successfully",
-      data: assignments,
-    },
-    { status: 200 },
-  );
-}
-
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { title, course, description = "", deadline, status } = body;
+    const { title, description, dueDate, status } = body;
 
-    if (!title || !course || !deadline || !status) {
+    if (!title || !description || !dueDate || !status) {
       return NextResponse.json(
-        { message: "title, course, deadline, and status are required" },
+        { message: "All fields are required" },
         { status: 400 },
       );
     }
 
-    if (!validStatuses.includes(status)) {
-      return NextResponse.json(
-        { message: "status must be pending, in_progress, or completed" },
-        { status: 400 },
-      );
+    const allowedStatuses = ["create", "on process", "submitted"];
+
+    if (!allowedStatuses.includes(status)) {
+      return NextResponse.json({ message: "Invalid status" }, { status: 400 });
     }
 
-    const now = new Date().toISOString();
+    const assignment = await prisma.assignment.create({
+      data: {
+        title,
+        description,
+        dueDate: new Date(dueDate),
+        status,
+      },
+    });
 
-    const newAssignment = {
-      id: assignments.length ? assignments[assignments.length - 1].id + 1 : 1,
-      title,
-      course,
-      description,
-      deadline,
-      status,
-      createdAt: now,
-      updatedAt: now,
-    };
-
-    assignments.push(newAssignment);
+    return NextResponse.json(assignment, { status: 201 });
+  } catch (error) {
+    console.error("POST /api/assignments error:", error);
 
     return NextResponse.json(
-      {
-        message: "Assignment created successfully",
-        data: newAssignment,
-      },
-      { status: 201 },
+      { message: "Failed to create assignment" },
+      { status: 500 },
     );
-  } catch {
-    return NextResponse.json({ message: "Invalid JSON body" }, { status: 400 });
   }
 }

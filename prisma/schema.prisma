@@ -1,0 +1,17 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Assignment {
+  id             Int      @id @default(autoincrement())
+  title          String
+  description    String
+  assignmentDate DateTime @default(now())
+  dueDate        DateTime
+  status         String
+}
