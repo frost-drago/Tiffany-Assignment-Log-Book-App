@@ -5,20 +5,11 @@ A REST API built with Next.js App Router for managing assignments.
 ## Features
 - View all assignments
 - Create new assignment
-- View assignment detail
-- Update assignment
-- Delete assignment
 - Swagger API documentation
 
 ## API Design
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | /api/assignments | Get all assignments |
-| POST | /api/assignments | Create a new assignment |
-| GET | /api/assignments/:id | Get assignment detail |
-| PUT | /api/assignments/:id | Update assignment |
-| DELETE | /api/assignments/:id | Delete assignment |
+in README.pdf
 
 ## Sample Assignment Object
 
