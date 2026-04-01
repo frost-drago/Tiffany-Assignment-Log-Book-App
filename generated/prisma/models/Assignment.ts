@@ -1068,6 +1068,7 @@ export type AssignmentCreateManyArgs<ExtArgs extends runtime.Types.Extensions.In
    * The data used to create many Assignments.
    */
   data: Prisma.AssignmentCreateManyInput | Prisma.AssignmentCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1086,6 +1087,7 @@ export type AssignmentCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Exte
    * The data used to create many Assignments.
    */
   data: Prisma.AssignmentCreateManyInput | Prisma.AssignmentCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
