@@ -1,4 +1,4 @@
-# YourName Assignment Log Book App
+# Tiffany Assignment Log Book App
 
 A REST API built with Next.js App Router for managing assignments.
 
